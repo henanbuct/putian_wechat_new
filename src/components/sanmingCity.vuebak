@@ -1,0 +1,522 @@
+﻿<template>
+<div class="county">
+    <div class="title" :class="{active:changeSwitch==1}" @click=" changeColor(1)">
+         <img src="./../assets/qiweng.png" alt="">
+        <div>气温(℃)</div>
+    </div>
+    <div class="title" :class="{active:changeSwitch==2}" @click=" changeColor(2)">
+     <img src="./../assets/jiangshui.png" alt="">
+        <div>降水(mm)</div>
+    </div>
+    <div class="title" :class="{active:changeSwitch==3}" @click=" changeColor(3)">
+   <img src="./../assets/shidu.png" alt="">
+        <div>湿度(℃)</div>
+    </div>
+    <div class="timeTitle">
+        <div class="timeIcon"></div>
+        观测时间：{{observe_time}}
+    </div>
+    <iframe ref="ifra" src="/smwx/sebSam/index.html?type=1"></iframe>
+    <!--<img src="./../assets/logo.png" alt="" class="map">-->
+    <div class="temperature" v-if="this.changeSwitch==1">
+        <div :class="{active: changeTemperature==1}" @click="changeTemperatures(1)">{{topSelect?"当前气温":"当前降水"}}</div>
+        <div :class="{active: changeTemperature==2}" @click="changeTemperatures(2)">高温24h</div>
+        <div :class="{active: changeTemperature==3}" @click="changeTemperatures(3)">低温24h</div>
+    </div>
+
+    <div class="temperature" v-if="this.changeSwitch==2">
+        <div :class="{active: changeTemperature==1}" @click="changeTemperatures(1)">当前降水</div>
+        <div :class="{active: changeTemperature==2}" @click="changeTemperatures(2)">3h降水</div>
+        <div :class="{active: changeTemperature==3}" @click="changeTemperatures(3)">6h降水</div>
+        <div :class="{active: changeTemperature==4}" @click="changeTemperatures(4)">12h降水</div>
+        <div :class="{active: changeTemperature==5}" @click="changeTemperatures(5)">24h降水</div>
+    </div>
+
+    <div class="temperature" v-if="this.changeSwitch==3">
+        <div :class="{active: changeTemperature==1}" @click="changeTemperatures(1)" style="display:none">相对湿度</div>
+    </div>
+    <div v-if="this.changeSwitch==1">
+        <div class="everyTemperature">
+            <div class="sort" @click="changeColors3(1);sortNowTemperature('气温')" :class="{active:changeColor3==1}">
+                <div>{{sort?"":""}}</div>
+                <!--<img :src=sortImg alt="">-->
+            </div>
+            <div @click="changeColors3(2)" :class="{active:changeColor3==2}">当前<img :src=sortImg alt="" style="width: 6px;height: 12px;"></div>
+            <div @click="changeColors3(3)" :class="{active:changeColor3==3}">24h最高</div>
+            <div @click="changeColors3(4)" :class="{active:changeColor3==4}">24小时最低</div>
+        </div>
+        <div class="everyTemperature" style="margin-top:1%;" v-for="(no_end,index) in no_ends">
+            <div class="sort" style="background-color: rgba(20,61,114,0.7);">
+                <div class="round"
+                :class="{active1:index==0,active2:index==1,active3:index==2}">{{index+1}}</div>
+                <div style="width:auto">{{ no_end.owner_city}}-{{ no_end.name}}</div>
+            </div>
+            <div>{{ no_end.tem}}</div>
+            <div>{{ no_end.tem_max}}</div>
+            <div>{{ no_end.tem_min}}</div>
+        </div>
+    </div>
+    <div v-if="this.changeSwitch==2" style="width:100%">
+                <div class="everyTemperature">
+            <div class="sort" @click="changeColors3(1);sortNowTemperature('降水')" :class="{active:changeColor3==1}">
+                <div>{{sort?"":""}}</div>
+            <!--<img :src=sortImg alt="">-->
+            </div>
+            <div @click="changeColors3(2)" :class="{active:changeColor3==2}" style="width:14.3%">当前</div>
+            <div @click="changeColors3(3)" :class="{active:changeColor3==3}" style="width:14.3%">3h</div>
+            <div @click="changeColors3(4)" :class="{active:changeColor3==4}" style="width:14.3%">6h</div>
+                 <div @click="changeColors3(5)" :class="{active:changeColor3==5}" style="width:14.3%">12h</div>
+                      <div @click="changeColors3(6)" :class="{active:changeColor3==6}" style="width:14.3%">24h</div>
+        </div>
+        <div class="everyTemperature" style="margin-top:1%;" v-for="(no_end,index) in no_ends">
+            <div class="sort" style="background-color: rgba(20,61,114,0.7);">
+                <div class="round"
+                :class="{active1:index==0,active2:index==1,active3:index==2}">{{index+1}}</div>
+                <div style="width:auto">{{ no_end.owner_city}}-{{ no_end.name}}</div>
+            </div>
+            <div style="width:14.3%">{{ no_end.pre_1h}}</div>
+            <div style="width:14.3%">{{ no_end.pre_3h}}</div>
+            <div style="width:14.3%">{{ no_end.pre_6h}}</div>
+                 <div style="width:14.3%">{{ no_end.pre_12h}}</div>
+                      <div style="width:14.3%">{{ no_end.pre_24h}}</div>
+        </div>
+    </div>
+
+
+        <div v-if="this.changeSwitch==3" style="width:100%">
+                <div class="everyTemperature">
+            <div class="sort" @click="changeColors3(1);sortNowTemperature('湿度')" :class="{active:changeColor3==1}">
+                <div>{{sort?"":""}}</div>
+                <!--<img :src=sortImg alt="">-->
+            </div>
+            <div @click="changeColors3(2)" :class="{active:changeColor3==2}" style="width:35.3%">相对湿度</div>
+            <div @click="changeColors3(3)" :class="{active:changeColor3==3}" style="width:35.3%">24小时最低湿度</div>
+
+        </div>
+        <div class="everyTemperature" style="margin-top:1%;" v-for="(no_end,index) in no_ends">
+            <div class="sort" style="background-color: rgba(20,61,114,0.7);">
+                <div class="round"
+                :class="{active1:index==0,active2:index==1,active3:index==2}">{{index+1}}</div>
+                <div style="width:auto">{{ no_end.owner_city}}-{{ no_end.name}}</div>
+            </div>
+            <div style="width:35.3%">{{ no_end.rhu}}%</div>
+            <div style="width:35.3%">{{no_end.rhu_min}}%</div>
+        </div>
+    </div>
+</div>
+</template>
+<script>
+import axios from 'axios'
+import { type } from 'os';
+import { types } from 'util';
+export default {
+    data(){
+        return{
+            waters:[],
+            sortImg:require('./../assets/path_down.png'),
+            topSelect:true,
+            sort:true,
+            nowCounty:0,
+            changeColor3:2,
+            changeSwitch:1,
+            changeTemperature:1,
+            observe_time:"2019-06-15 14:30:27",
+            countyLists:[{
+                countyName:'明溪县',
+                pinyin:'mingxi'
+            },
+            {
+                countyName:'清流县',
+                pinyin:'qingliu'
+            },
+            {
+                countyName:'宁化县',
+                 pinyin:'ninghua'
+            },
+            {
+                countyName:'沙县',
+                 pinyin:'sha'
+            },
+            {
+                countyName:'尤溪县',
+                pinyin:'youxi'
+            },
+                       {
+                countyName:'大田县',
+                pinyin:'datian'
+            },
+                       {
+                countyName:'泰宁县',
+                pinyin:'taining'
+            },
+                       {
+                countyName:'建宁县',
+                pinyin:'jianning'
+            },
+                       {
+                countyName:'永安县',
+                pinyin:'yongan'
+            },
+                       {
+                countyName:'将乐县',
+                pinyin:'jiangle'
+            }
+            ],
+        no_ends:[
+                        {
+             now:21,
+             max24:25,
+             min24:20
+
+            },
+            {
+             now:27,
+             max24:29,
+             min24:23
+
+            },
+            {
+             now:22,
+             max24:28,
+             min24:19
+
+            },
+            {
+             now:23,
+             max24:27,
+             min24:18
+
+        }
+        ]
+
+        }
+    },
+    methods:{
+        changeColor(n){
+            this.changeSwitch=n;
+            this.changeTemperature=1;
+            this.changeColor3=2
+
+            if(n==2){
+                this.$refs.ifra.src = "/smwx/sebSam/index.html?type=4";
+                this.no_ends.sort(function(a,b) {
+                    if(this.sort){
+                        return a.pre_1h-b.pre_1h
+                    }
+                    else{
+                         return b.pre_1h-a.pre_1h
+                    }
+                })
+            }
+
+            if(n==3){
+                this.$refs.ifra.src = "/smwx/sebSam/index.html?type=9";
+                this.no_ends.sort(function(a,b) {
+                    if(this.sort){
+                        return a.rhu-b.rhu
+                    }
+                    else{
+                         return b.rhu-a.rhu
+                    }
+                })
+
+            }
+
+            if(n==1){
+                this.$refs.ifra.src = "/smwx/sebSam/index.html?type=1";
+                this.no_ends.sort(function(a,b) {
+                    if(this.sort){
+                        return a.tem-b.tem
+                    }
+                    else{
+                         return b.tem-a.tem
+                    }
+                })
+
+            }
+
+
+
+        },
+        changeTemperatures(n){
+            this.changeTemperature=n;
+            let m;
+            if (this.changeSwitch == 2) {
+                m = n + 3
+            } else if (this.changeSwitch == 3) {
+                m = 9;
+            } else {
+                m = n;
+            }
+            this.$refs.ifra.src = "/smwx/sebSam/index.html?type="+m;
+        },
+        changeColors3(n){
+            this.changeColor3 = n;
+        },
+        changeNowCounty(n){
+            this.nowCounty = n;
+        },
+        sortNowTemperature(type){
+            this.sort = !this.sort;
+            if(type=="降水"){
+                this.no_ends.sort((a,b)=> {
+                    if(this.sort){
+                        this.sortImg = require('./../assets/icon/shengxu.png')
+                        return a.pre_1h-b.pre_1h
+                    }
+                    else {
+                        this.sortImg = require('./../assets/icon/jiangxu.png')
+                        return b.pre_1h-a.pre_1h
+                    }
+                })
+            }
+            if(type=="湿度"){
+                this.no_ends.sort((a,b)=> {
+                    if(this.sort){
+                             this.sortImg = require('./../assets/icon/shengxu.png')
+                        return a.rhu-b.rhu
+                    }
+                    else{
+                            this.sortImg = require('./../assets/icon/jiangxu.png')
+                         return b.rhu-a.rhu
+                    }
+                })
+
+            }
+
+            if(type=="气温"){
+                this.no_ends.sort((a,b)=> {
+                    if(this.sort){
+                             this.sortImg = require('./../assets/icon/shengxu.png')
+                        return a.tem-b.tem
+                    }
+                    else{
+                             this.sortImg = require('./../assets/icon/jiangxu.png')
+                         return b.tem-a.tem
+                    }
+                })
+
+            }
+
+        }
+
+    },
+    mounted(){
+        this.$nextTick(function(){
+            if(this.sort){
+                this.no_ends.sort(
+                    function(a,b){
+                        return a.now-b.now
+                })
+
+            }
+            else{
+                this.no_ends.sort(
+                function(a,b){
+                    return b.now-a.now
+                })
+            }
+        })
+    
+        this.$nextTick(function(){
+            axios.get('http://218.86.120.188:7941/sanming/public/get/getground?county=big').then(
+                (response=>{
+                    localStorage.setItem("sebData", JSON.stringify(response.data));
+                    this.$refs.ifra.src = "/smwx/sebSam/index.html?type=1";
+                    let allCounty = response.data
+                    console.log(allCounty)
+                    this.observe_time = allCounty[0].time
+                    this.no_ends = allCounty
+                    this.no_ends.forEach((item=>{
+                        this.waters.push(item.water)
+                    }))
+                })
+            )
+        })
+    }
+    
+}
+</script>
+<style lang="scss" scoped>
+    @import "../assets/style/main.scss";
+        iframe{
+        width: 100%;
+        height: px2rem(400*4);
+    border: 0;
+    }
+    .county{
+        .selectCity{
+            width: px2rem(280*4);
+            height: px2rem(194*4);
+            position: absolute;
+
+        }
+  
+        display: flex;
+        flex-flow: row wrap;
+        background-color: #0786D2;
+        .everyTemperature{
+            display: flex;
+            flex-flow: row wrap;
+            background-color: rgba(34,89,161,0.8);
+            .active{
+                background-color: #28BAF3;
+            }
+            div{
+                width: px2rem(90*4);
+                height: px2rem(40*4);
+                color: #FFFFFF;
+                font-size: px2rem(13*4);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .sort{
+                width: px2rem(105*4);
+                height: px2rem(40*4);
+                display: flex;
+                .round{
+                    width: px2rem(18*4);
+                    height: px2rem(18*4);
+                    border-radius: 50%;
+                    background-color: #03A4FF;
+                    margin-right: px2rem(5*4);
+                }
+                .active1{
+                    background-color: red;
+                }
+                 .active2{
+                    background-color: #F5A623;
+                }
+                 .active3{
+                    background-color: #F8E71C;
+                }
+                img{
+                       width: px2rem(18*4);
+                    height: px2rem(16*4);
+                    margin-left: px2rem(13*4);
+
+                }
+                div{
+                    width: px2rem(28*4);
+                    height: px2rem(20*4);
+                }
+            }
+        }
+    
+        .temperature{
+            position: absolute;
+            display: flex;
+            width: 100%;
+            height: px2rem(25*4);
+            top: px2rem(94*4);
+            justify-content: center;
+            div{
+                width: px2rem(72*4);
+                height: px2rem(25*4);
+                line-height: px2rem(25*4);
+                text-align: center;
+                font-size: px2rem(14*4);
+                color: white;
+                margin-left:px2rem(4*4);
+                border-radius:px2rem(12*4);
+                background-color: rgba($color: #000000, $alpha: 0.5);
+                border-radius: px2rem(4*4);
+            }
+            .active{
+                background-color: #28BAF3;
+                color: white;
+            }
+        }
+        .temperature :nth-child(1){
+                margin-left: 0;
+            
+        }
+        .map{
+            width: 100%;
+            height: px2rem(310*4);
+        }
+        .title.active{
+            background-color: #28BAF3;
+        }
+        .countyList :nth-child(1){
+                margin: px2rem(15*4) 0 0 0;
+            }
+                    .countyList :nth-child(6){
+                margin: px2rem(15*4) 0 0 0;
+            }    
+        .countyList{
+            display: flex;
+            flex-flow: row wrap;
+            width: 100%;
+            height: px2rem(100*4);
+            background-color: white;
+            justify-content: center;
+            align-content:flex-start;
+            .active{
+                background-color: #28BAF3;
+                color: white;
+            }
+                                       
+            div{
+                font-size: px2rem(14*4);
+                display: flex;
+                flex-flow: row wrap;
+                justify-content: space-around;
+                align-items: center;
+                width: px2rem(57*4);
+                height: px2rem(30*4);
+                color: #2BADE8;
+                border: px2rem(1*4) solid #2BADE8;
+                box-sizing: border-box;
+                margin-left: px2rem(10*4);
+                margin-top:px2rem(15*4);   
+            }
+        }
+        .timeTitle{
+            width: 100%;
+            height: px2rem(29*4);
+            display: flex;
+            flex-flow: row wrap;
+            align-items: center;
+            justify-content: center;
+            font-size: px2rem(14*4);
+            color: white;
+            .timeIcon{
+                width: px2rem(13*4);
+                height: px2rem(13*4);
+                display: inline-block;
+                background-image: url('./../assets/icon/time@2x.png');
+                background-size: cover;
+
+            }
+        }
+        .title{
+            display: flex;
+             flex-flow: column wrap;
+             width: 33%;
+             height: px2rem(55*4);
+             background-color: rgba(0,0,0,0.4);
+             border-right: px2rem(1*4) solid rgba(255, 255, 255,0.6);
+             img{
+                 width: px2rem(22*4);
+                 height: px2rem(22*4);
+                 display: block;
+                 align-self:center;
+                 margin-top:px2rem(10*4);
+             }
+             div{
+                 width: 100%;
+                 font-size: px2rem(12*4);
+                 text-align: center;
+                 color: white;
+                 line-height: px2rem(17*4);
+             }
+        }
+
+    }
+
+
+
+
+</style>
